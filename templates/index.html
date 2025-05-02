@@ -79,18 +79,18 @@
     function resetGame() {
       socket.emit('reset');
     }
-
-    socket.on('connect', () => {
-      if (!myColor) {
-        myColor = 'black';
-        myTurn = true;
-        document.getElementById('status').textContent = "你是先手 (黑)";
-      } else {
-        myColor = 'white';
-        myTurn = false;
-        document.getElementById('status').textContent = "你是後手 (白)";
-      }
+    
+    socket.on('assign_color', (data) => {
+      myColor = data.color;
+      myTurn = (myColor === 'black');
+      document.getElementById('status').textContent =
+      myTurn ? "你是先手 (黑)" : "你是後手 (白)";
     });
+
+    socket.on('full', (data) => {
+      alert(data.msg);
+    });
+
 
     drawBoard();
   </script>
