@@ -1,30 +1,19 @@
 # app.py
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'gomoku-secret'
 socketio = SocketIO(app)
 
+# 儲存遊戲狀態
 board = [['' for _ in range(15)] for _ in range(15)]
 current_player = 'black'
 game_over = False
-clients = {}
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@socketio.on('connect')
-def assign_player():
-    sid = request.sid
-    if len([c for c in clients.values() if c in ('black', 'white')]) == 0:
-        clients[sid] = 'black'
-    elif len([c for c in clients.values() if c in ('black', 'white')]) == 1:
-        clients[sid] = 'white'
-    else:
-        clients[sid] = 'spectator'
-    emit('assign_color', {'color': clients[sid]})
 
 @socketio.on('move')
 def handle_move(data):

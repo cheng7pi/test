@@ -56,24 +56,12 @@
       socket.emit('move', { x, y });
     });
 
-    socket.on('assign_color', data => {
-      myColor = data.color;
-      if (myColor === 'spectator') {
-        document.getElementById('status').textContent = "你是觀戰者";
-      } else {
-        document.getElementById('status').textContent = `你是 ${myColor === 'black' ? '先手 (黑)' : '後手 (白)'}`;
-        myTurn = (myColor === 'black');
-      }
-    });
-
     socket.on('move_made', data => {
       const { x, y, player } = data;
       board[y][x] = player;
       drawStone(x, y, player);
       myTurn = (player !== myColor);
-      if (myColor !== 'spectator') {
-        document.getElementById('status').textContent = myTurn ? "輪到你了" : "對手行動中...";
-      }
+      document.getElementById('status').textContent = myTurn ? "輪到你了" : "對手行動中...";
     });
 
     socket.on('game_over', data => {
@@ -91,6 +79,18 @@
     function resetGame() {
       socket.emit('reset');
     }
+
+    socket.on('connect', () => {
+      if (!myColor) {
+        myColor = 'black';
+        myTurn = true;
+        document.getElementById('status').textContent = "你是先手 (黑)";
+      } else {
+        myColor = 'white';
+        myTurn = false;
+        document.getElementById('status').textContent = "你是後手 (白)";
+      }
+    });
 
     drawBoard();
   </script>
