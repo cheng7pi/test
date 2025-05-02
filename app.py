@@ -1,6 +1,20 @@
 # app.py
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+from flask import request
+
+clients = []
+
+@socketio.on('connect')
+def handle_connect():
+    global clients
+    if len(clients) >= 2:
+        emit('full', {'msg': '房間已滿'})
+        return
+    sid = request.sid
+    clients.append(sid)
+    color = 'black' if len(clients) == 1 else 'white'
+    emit('assign_color', {'color': color})
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'gomoku-secret'
